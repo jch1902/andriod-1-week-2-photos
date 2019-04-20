@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,7 +47,15 @@ public class ProfileFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.fp_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//      recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup(){
+            public int getSpanSize(int position){
+                return feedAdapter.getSpanSize(position);
+            }
+        });
+        recyclerView.setLayoutManager(gridLayoutManager);
+        feedAdapter.setGridMode(true);
         recyclerView.setAdapter(feedAdapter);
 
         String username = "user-1";
@@ -62,6 +71,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataFetched(Profile profile) {
                 feedAdapter.setProfile(profile);
+
             }
         });
 

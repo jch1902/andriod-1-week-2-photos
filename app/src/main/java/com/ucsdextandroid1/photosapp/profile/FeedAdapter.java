@@ -3,6 +3,7 @@ package com.ucsdextandroid1.photosapp.profile;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ucsdextandroid1.photosapp.data.Post;
@@ -14,30 +15,24 @@ import java.util.List;
 /**
  * Created by rjaylward on 4/12/19
  */
-public class FeedAdapter extends RecyclerView.Adapter {
+public class FeedAdapter extends RecyclerView.Adapter  {
 
-//    private List<Post> items = new ArrayList<>();
     private List<FeedAdapterItem> items = new ArrayList<>();
-
     private List<Post> currentPosts;
     private Profile currentProfile;
-
-    @Nullable private FeedCallback currentFeedCallback;
+    private boolean isGridMode = false;
 
     public void setPosts(List<Post> posts) {
         currentPosts = posts;
         setItems(currentPosts, currentProfile);
-
 //        items.clear();
 //        items.addAll(posts);
 //        notifyDataSetChanged();
     }
-
-    public void setProfile(Profile profile) {
-        currentProfile = profile;
-        setItems(currentPosts, currentProfile);
+    public void setGridMode(boolean isGridMode){
+        this.isGridMode = isGridMode;
+        notifyDataSetChanged();
     }
-
     public void setItems(List<Post> posts, @Nullable Profile profile) {
         items.clear();
         if(profile != null)
@@ -49,39 +44,39 @@ public class FeedAdapter extends RecyclerView.Adapter {
 
         notifyDataSetChanged();
     }
+    public void setProfile(Profile profile) {
+        currentProfile = profile;
+        setItems(currentPosts, currentProfile);
+    }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        switch(viewType) {
+        switch(viewType){
             case FeedAdapterItem.TYPE_POST:
-                return PostViewHolder.inflate(viewGroup)
-                        .setCallback(currentFeedCallback);
+                return PostViewHolder.inflate(viewGroup);
             case FeedAdapterItem.TYPE_PROFILE:
-                return ProfileViewHolder.inflate(viewGroup)
-                        .setCallback(currentFeedCallback);
+                return ProfileViewHolder.inflate(viewGroup);
+            default :
+                throw new IllegalArgumentException("Undefined argument");
         }
-
-        return PostViewHolder.inflate(viewGroup)
-                .setCallback(currentFeedCallback);
+     //   return PostViewHolder.inflate(viewGroup);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if(viewHolder instanceof PostViewHolder)
-            ((PostViewHolder) viewHolder).bindPost(getPost(position));
-        else if (viewHolder instanceof ProfileViewHolder)
+            ((PostViewHolder) viewHolder).bindPost(getPost(position),isGridMode);
+        else if(viewHolder instanceof ProfileViewHolder)
             ((ProfileViewHolder) viewHolder).bind(getProfile(position));
     }
 
     private Post getPost(int index) {
         return items.get(index).getPost();
     }
-
     private Profile getProfile(int index) {
         return items.get(index).getProfile();
     }
-
     @Override
     public int getItemCount() {
         return items.size();
@@ -91,12 +86,15 @@ public class FeedAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         return items.get(position).getType();
     }
-
-    public void setFeedCallback(FeedCallback callback) {
-        currentFeedCallback = callback;
+    public int getSpanSize(int position){
+        switch(getItemViewType(position)){
+            case FeedAdapterItem.TYPE_POST:
+                return 1;
+            case FeedAdapterItem.TYPE_PROFILE:
+                return 3;
+        }
+        return 0;
     }
-
-    public interface FeedCallback extends PostViewHolder.PostCallback, ProfileViewHolder.ProfileCallback {}
 
     private static class FeedAdapterItem {
 

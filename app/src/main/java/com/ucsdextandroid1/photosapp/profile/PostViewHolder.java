@@ -4,12 +4,14 @@ import android.content.res.Resources;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.ucsdextandroid1.photosapp.R;
 import com.ucsdextandroid1.photosapp.data.Post;
@@ -74,7 +76,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
      * Displays the Post
      * @param post post
      */
-    public void bindPost(@Nullable Post post) {
+    public void bindPost(@Nullable Post post, boolean isGridMode) {
         currentPost = post;
 
         if(currentPost != null) {
@@ -84,7 +86,10 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             captionView.setText(currentPost.getCaption());
             datetimeLabel.setText(formatDatetime(itemView.getResources(), post.getTimestamp()));
 
-            Picasso.get().load(currentPost.getImageUrl()).into(imageView);
+            Picasso.get().load(currentPost.getImageUrl())
+                    .placeholder(android.R.color.holo_blue_dark)
+                    .into(imageView);
+
             Picasso.get().load(currentPost.getProfileImageUrl()).into(userIconView);
         }
         else {
@@ -97,6 +102,18 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             imageView.setImageResource(android.R.color.white);
             userIconView.setImageResource(android.R.color.white);
         }
+        int visiblity = isGridMode ? View.GONE : View.VISIBLE;
+
+        userIconView.setVisibility(visiblity);
+        usernameView.setVisibility(visiblity);
+        locationView.setVisibility(visiblity);
+        heartIcon.setVisibility(visiblity);
+        datetimeLabel.setVisibility(visiblity);
+        captionView.setVisibility(visiblity);
+        bookmarkIcon.setVisibility(visiblity);
+        commentIcon.setVisibility(visiblity);
+        sendIcon.setVisibility(visiblity);
+        menuIcon.setVisibility(visiblity);
 
     }
 
